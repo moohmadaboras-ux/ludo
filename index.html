@@ -59,7 +59,7 @@ button:active{transform:translateY(3px);box-shadow:0 1px 0 #3a2d9c}button.g{box-
 .p i{box-shadow:inset -3px -4px 6px #0005,inset 3px 3px 5px #fff7,0 3px 6px #0008}
 #bd::after{content:'';position:absolute;inset:0;background:linear-gradient(160deg,#fff3,transparent 40%);pointer-events:none}
 #dk,#pn{box-shadow:0 8px 20px #0003}
-</style></head><body><div id="app">
+</style><script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script></head><body><div id="app">
 <div id="menu" class="card"><div class="hero"><div id="hd"></div><h1>لودو</h1><p>ملك لعبة الطاولة: العب ضد الكمبيوتر أو مع أصحابك</p></div><p>اختر لونك</p><div id="cp" style="display:flex;gap:14px;justify-content:center"></div>
 <button id="mb">ضد الكمبيوتر (بدون إنترنت)</button><button id="ml">١ ضد ١ على نفس الجوال</button><button id="mh">أونلاين ١ ضد ١: أنشئ غرفة</button><button id="m4">أونلاين ٤ لاعبين: أنشئ غرفة</button><button class="g" id="mj">عندي كود دعوة</button></div>
 <div id="host" hidden><div id="hl" style="display:flex;flex-direction:column;gap:10px"></div></div>
@@ -148,4 +148,26 @@ $('cb').innerHTML=[[1,''],[6,'rotateY(180deg)'],[3,'rotateY(90deg)'],[4,'rotateY
 $('mtb').innerHTML=ic('vol');$('fsb').innerHTML=ic('full');$('xb').innerHTML=ic('x');
 $('hd').innerHTML=COL.map(c=>`<span style="color:${c}">${ic('dice',36)}</span>`).join('');
 [['mb','bot'],['ml','group'],['mh','globe'],['m4','group'],['mo','person'],['mj','add']].forEach(([i,n])=>{const b=$(i);b&&b.insertAdjacentHTML('afterbegin',ic(n,22))});
+
+const wp=dc=>{const a={send:m=>dc.send(m),get readyState(){return dc.open?'open':'closed'},onopen:null,onmessage:null,onclose:null};dc.on('open',()=>a.onopen&&a.onopen());dc.on('data',d=>a.onmessage&&a.onmessage({data:d}));dc.on('close',()=>a.onclose&&a.onclose());dc.on('error',()=>a.onclose&&a.onclose());return a};
+function hostLink(n){
+ if(typeof Peer=='undefined')return go(n);
+ mode='host';me=pickC;conns=[];show('host');
+ const seats=n==4?[0,1,2,3].filter(x=>x!=pickC):[(pickC+2)%4];
+ $('hl').innerHTML='<div class="card"><p>أرسل هذا الرابط لأصحابك وخلّيهم يفتحوه:</p><textarea readonly placeholder="جارٍ تجهيز الرابط…"></textarea><button>مشاركة الرابط</button><p id="hs"></p></div>';
+ const ta=$('hl').querySelector('textarea'),bt=$('hl').querySelector('button'),hs=$('hs');
+ const upd=()=>hs.textContent='انضم '+conns.filter(x=>x.c.readyState=='open').length+' من '+(n-1)+' — لا تقفل هذه الصفحة';
+ const peer=new Peer('ludo'+Math.random().toString(36).slice(2,8));
+ peer.on('open',id=>{const l=location.origin+location.pathname+'#r='+id;ta.value=l;bt.onclick=()=>share('تعال نلعب لودو: '+l);upd()});
+ peer.on('error',()=>toast('تعذر الاتصال بخدمة الغرف. جرّب مرة ثانية'));
+ peer.on('connection',dc=>{if(conns.length>=n-1){dc.close();return}const sd=seats[conns.length],a=wp(dc);conns.push({c:a});
+  a.onopen=()=>{a.send(JSON.stringify({me:sd}));upd();if(conns.length==n-1&&conns.every(x=>x.c.readyState=='open')){show('game');S=newS(n,pickC);sync()}};
+  a.onmessage=e=>{const m=JSON.parse(e.data);if(m.a)apply(m.a,sd)};a.onclose=()=>toast('انقطع الاتصال')})}
+function guestLink(id){
+ mode='guest';me=2;$('hl').innerHTML='<div class="card"><p>جارٍ الاتصال باللعبة…</p></div>';show('host');
+ const fail=()=>{$('hl').innerHTML='<div class="card"><p>تعذر الاتصال. تأكد إن صاحبك فاتح اللعبة، ثم حدّث الصفحة.</p></div>'},tm=setTimeout(fail,20000),peer=new Peer();
+ peer.on('error',()=>{clearTimeout(tm);fail()});
+ peer.on('open',()=>{const a=wp(peer.connect(id,{reliable:true}));wire(a);const o=a.onopen;a.onopen=()=>{clearTimeout(tm);o()}})}
+$('mh').onclick=()=>hostLink(2);$('m4').onclick=()=>hostLink(4);
+{const m=/^#r=([\w-]+)$/.exec(location.hash);if(m){if(typeof Peer=='undefined')toast('تعذر تحميل مكتبة الاتصال');else guestLink(m[1])}}
 </script></body></html>
