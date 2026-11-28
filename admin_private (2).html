@@ -1,0 +1,49 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>لوحة الإدارة (خاصة)</title>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<style>*{box-sizing:border-box}body{font-family:Tajawal,system-ui,sans-serif;background:#171433;color:#fff;max-width:560px;margin:0 auto;padding:16px}h2{color:#ffe08a;margin:6px 0 12px}label{display:block;font-size:13px;margin-top:10px;color:#d9d3ee}input,button{width:100%;font:inherit;padding:12px;margin:5px 0;border-radius:12px;border:2px solid #7770b5;background:#292451;color:#fff}button{background:#ffd54a;color:#2a2100;font-weight:800;border:0;cursor:pointer}button.g{background:#3a3470;color:#fff}button:disabled{opacity:.6}.card{background:#211b4b;border-radius:16px;padding:14px;margin-bottom:12px}.row{display:flex;gap:8px}.row>*{flex:1}.w{background:#5a1020;border-radius:12px;padding:10px;font-size:13px}.ok{color:#8dffb4}.pn{color:#ffe08a}.er{color:#ff9c9c}.it{border-top:1px solid #ffffff26;padding:8px 0;font-size:14px}.it small{display:block;color:#bdb6e6}.it button{width:auto;padding:4px 10px;margin:4px 0 0}</style></head><body>
+<h2>🛠 لوحة الإدارة</h2>
+<script id="blob" type="application/json">{"s":"7W3SoOQ6adCKH2+5u4DTpQ==","i":"rvj0CiVNfFzaOpAs","c":"tPIBl3ZAynHhbKz+y9GWVDrDBKfR6pHoCm/vpm3C/Or4jnEPfLRzSus9Gk8XCSNmp2LH4/+MvYCFFqd/Rx95PwTKVL4E5N701yMIP9fxCPBAXDmrXQy7SmaRySCYYWdxbQH6NOM8QU2rMtW3Adem76irT5JhMeIryH7ACfb5mpKxqRvCv78x6lk7TuuhGalIWGWkmuT/+0os1lQUA8qXhlF1cVwFVq+/5SpD73mZATa1tmjMqVOlUhj9+G+zFTxK","n":600000}</script>
+<div id="lg" class="card"><p class="w">⚠ ملف خاص. لا ترفعه على GitHub ولا ترسله لأحد.</p>
+<label>اسم المستخدم</label><input id="u" autocomplete="username"><label>كلمة المرور</label><input id="p" type="password" autocomplete="current-password"><button id="lb">دخول</button><p id="le" class="er"></p></div>
+<div id="ad" hidden>
+<div class="card"><label>معرّف اللاعب (6 خانات)</label><div class="row"><input id="f" maxlength="6" style="direction:ltr;text-transform:uppercase" placeholder="مثال: SZQGJ3"><button class="g" id="ck" style="flex:0 0 90px">فحص</button></div><p id="cs" style="font-size:13px;margin:2px 0"></p>
+<label>إضافة توكينز (اتركه فاضي إذا ما بدك — يقبل رقم سالب للخصم)</label><input id="k" type="number" inputmode="numeric" placeholder="مثال: 1000">
+<label>إضافة مستويات (اختياري — تنضاف فوق مستواه الحالي)</label><input id="l" type="number" inputmode="numeric" min="1" max="1000" placeholder="مثال: 2">
+<label>إضافة XP (اختياري — تنضاف فوق الحالي وبيترقى تلقائياً)</label><input id="x" type="number" inputmode="numeric" min="1" placeholder="مثال: 50">
+<button id="go">إرسال</button><p style="font-size:12px;color:#bdb6e6;margin:4px 0">اللاعب لازم يكون مسجّل دخول والصفحة مفتوحة عنده. إذا كان غير متصل بيبقى الطلب بالانتظار وبيعيد المحاولة تلقائياً طالما هالصفحة مفتوحة (حتى 3 أيام).</p></div>
+<div class="card"><b>السجل</b><div id="log"></div></div>
+<div class="card"><b>تغيير الاسم وكلمة المرور</b><label>اسم مستخدم جديد</label><input id="nu"><label>كلمة مرور جديدة (8 خانات على الأقل)</label><input id="np" type="password"><button class="g" id="cp">حفظ نسخة جديدة من الملف</button><p style="font-size:12px;color:#bdb6e6">بينزل ملف جديد بالاسم/الكلمة الجديدة، استبدل فيه الملف القديم واحذف القديم.</p></div>
+</div>
+<script>
+const SRC='<!doctype html>\n'+document.documentElement.outerHTML;
+const $=i=>document.getElementById(i),enc=new TextEncoder(),dec=new TextDecoder();
+const toB=u=>btoa(String.fromCharCode(...new Uint8Array(u))),fromB=t=>Uint8Array.from(atob(t),c=>c.charCodeAt(0));
+const b64u=u=>toB(u).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+let PRIV=null;
+async function dk(user,pass,salt,n,use){const b=await crypto.subtle.importKey('raw',enc.encode(user+'\n'+pass),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:n,hash:'SHA-256'},b,{name:'AES-GCM',length:256},false,[use])}
+$('lb').onclick=async()=>{$('le').textContent='';$('lb').disabled=true;try{const B=JSON.parse($('blob').textContent),k=await dk($('u').value.trim(),$('p').value,fromB(B.s),B.n,'decrypt');PRIV=JSON.parse(dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:fromB(B.i)},k,fromB(B.c))));$('p').value='';$('lg').hidden=true;$('ad').hidden=false;drawLog();retry()}catch(e){$('le').textContent='اسم المستخدم أو كلمة المرور غير صحيحة'}$('lb').disabled=false};
+$('p').onkeydown=e=>{if(e.key=='Enter')$('lb').click()};
+const ICE={config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'},{urls:'turn:eu-0.turn.peerjs.com:3478',username:'peerjs',credential:'peerjsp'},{urls:'turn:us-0.turn.peerjs.com:3478',username:'peerjs',credential:'peerjsp'}]}};
+function send(fid,msg,cb){if(typeof Peer=='undefined')return cb('noPeer');let d=0,p;const end=r=>{if(d)return;d=1;clearTimeout(tm);try{p.destroy()}catch(e){}cb(r)},tm=setTimeout(()=>end('offline'),12000);
+ p=new Peer(undefined,ICE);p.on('error',e=>end(e.message&&e.message.includes('ludoU')?'offline':'net'));
+ p.on('open',()=>{const c=p.connect('ludoU'+fid,{reliable:true});c.on('open',()=>c.send(JSON.stringify(msg)));c.on('error',()=>end('offline'));c.on('data',x=>{try{const r=JSON.parse(x);end(r.admAck?'ok':r.pong?r:r.admErr?'err:'+r.admErr:'?')}catch(e){end('?')}})})}
+const Q=()=>{try{return JSON.parse(localStorage.getItem('adm_q'))||[]}catch(e){return[]}},SQ=q=>{try{localStorage.setItem('adm_q',JSON.stringify(q.slice(-60)))}catch(e){}};
+function drawLog(){const q=Q().slice().reverse();$('log').innerHTML=q.length?'':'<p style="color:#bdb6e6">لا يوجد شي بعد</p>';q.forEach(it=>{const d=document.createElement('div');d.className='it';const st=it.st=='ok'?'<span class="ok">✓ وصل</span>':it.st=='wait'?'<span class="pn">⏳ بالانتظار (اللاعب غير متصل)</span>':'<span class="er">✗ '+(it.er||'فشل')+'</span>';d.innerHTML='<b style="direction:ltr;display:inline-block">'+it.fid+'</b> — '+it.ds+'<small>'+new Date(it.ts).toLocaleString('ar')+'</small>'+st;if(it.st=='wait'){const b=document.createElement('button');b.className='g';b.textContent='إلغاء';b.onclick=()=>{SQ(Q().filter(x=>x.msg.adm.i!=it.msg.adm.i));drawLog()};d.append(b)}$('log').append(d)})}
+let busy=0;function retry(tried){if(busy||!PRIV)return;tried=tried||new Set();const q=Q(),it=q.find(x=>x.st=='wait'&&!tried.has(x.msg.adm.i));if(!it)return;if(Date.now()-it.ts>3*864e5-6e4){it.st='err';it.er='انتهت المدة';SQ(q);drawLog();return retry(tried)}busy=1;tried.add(it.msg.adm.i);send(it.fid,it.msg,r=>{busy=0;const q2=Q(),x=q2.find(y=>y.msg.adm.i==it.msg.adm.i);if(!x)return retry(tried);if(r=='ok'){x.st='ok'}else if(typeof r=='string'&&r.startsWith('err:')){x.st='err';x.er='رفضها اللاعب ('+r.slice(4)+')'}SQ(q2);drawLog();retry(tried)})}
+setInterval(()=>retry(),15000);
+$('ck').onclick=()=>{const f=$('f').value.trim().toUpperCase();if(!/^[A-Z2-9]{6}$/.test(f))return $('cs').textContent='المعرّف 6 خانات';$('cs').textContent='جارٍ الفحص…';send(f,{ping:1},r=>{$('cs').innerHTML=r&&r.pong?'<span class="ok">متصل الآن — '+(r.name||'')+'</span>':'<span class="er">غير متصل حالياً</span>'})};
+$('go').onclick=async()=>{const f=$('f').value.trim().toUpperCase(),iv=i=>$(i).value.trim()===''?null:+$(i).value;const k=iv('k'),l=iv('l'),x=iv('x');
+ if(!/^[A-Z2-9]{6}$/.test(f))return alert('المعرّف لازم 6 خانات (أحرف كبيرة وأرقام)');
+ if(k==null&&l==null&&x==null)return alert('اكتب توكينز أو مستوى أو XP');
+ if((k!=null&&!Number.isInteger(k))||(l!=null&&!(Number.isInteger(l)&&l>=1&&l<=1000))||(x!=null&&!(Number.isInteger(x)&&x>=1)))return alert('إحدى القيم غير صحيحة');
+ const id=Array.from(crypto.getRandomValues(new Uint8Array(8)),v=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[v%32]).join(''),ts=Date.now();
+ const pay=JSON.stringify({t:f,k,L:l,X:x,i:id,s:ts}),key=await crypto.subtle.importKey('jwk',PRIV,{name:'ECDSA',namedCurve:'P-256'},false,['sign']);
+ const sig=b64u(await crypto.subtle.sign({name:'ECDSA',hash:'SHA-256'},key,enc.encode(pay)));
+ const ds=[k!=null?(k>=0?'+':'')+k+' توكينز':'',l!=null?'+'+l+' مستوى':'',x!=null?'+'+x+' XP':''].filter(Boolean).join('، ');
+ const q=Q();q.push({fid:f,ds,ts,st:'wait',msg:{adm:{p:pay,g:sig}}});SQ(q);drawLog();['k','l','x'].forEach(i=>$(i).value='');retry()};
+$('cp').onclick=async()=>{const u=$('nu').value.trim(),p=$('np').value;if(u.length<3||p.length<8)return alert('الاسم 3 خانات والكلمة 8 خانات على الأقل');
+ const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12)),n=600000,k=await dk(u,p,salt,n,'encrypt'),ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},k,enc.encode(JSON.stringify(PRIV)));
+ const nb=JSON.stringify({s:toB(salt),i:toB(iv),c:toB(ct),n});
+ const out=SRC.replace(/(<script id="blob" type="application\/json">)[\s\S]*?(<\/script>)/,(m,a,b)=>a+nb+b);
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([out],{type:'text/html'}));a.download='admin_private.html';a.click();alert('تم. استبدل الملف القديم بالجديد وجرّب الدخول بالبيانات الجديدة قبل ما تحذف القديم.')};
+</script></body></html>
